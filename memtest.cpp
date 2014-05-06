@@ -1,3 +1,6 @@
+// Project 3
+// By Maira, Tanner, and David
+
 #include <stdio.h>
 #include <stdlib.h>
 
