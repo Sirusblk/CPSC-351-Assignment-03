@@ -4,7 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-using namespace std;
+struct process
+{
+	int num;
+	int time_start;
+	int time_end;
+	int num_block;
+	int block_size[];
+};
 
 int main(int argc, char** argv)
 {
@@ -16,20 +23,11 @@ int main(int argc, char** argv)
 	}
 
 	//Variables
-	int memSize = argv[1];
-	int pageSize = argv[2];
-
-	//Start Counting
-	auto start = chrono::high_resolution_clock::now();
+	int memSize = atoi(argv[1]);
+	int pageSize = atoi(argv[2]);
 
 	//DO SOMETHING...
 
-	//Stop Counting
-	auto end = chrono::high_resolution_clock::now();
-
-	int microseconds = chrono::duration_cast<chrono::microseconds>(end - start).count();
-	double seconds = microseconds / 1E6;
-	cout << "Average Turnaround Time: " << seconds << " seconds" << endl;
 
 	return 0;
 }
