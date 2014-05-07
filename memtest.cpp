@@ -7,7 +7,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <list>
+#include <queue>
 using namespace std;
 
 struct process
@@ -21,8 +21,9 @@ struct process
 
 //Prototypes
 void readInFile(string, vector<process> &);
+void printOutput(vector<process> &, int &, int &);
+void v_print(vector<int> &);
 void debug_print(vector<process> &);
-void printOutput(vector<process> &);
 
 int main(int argc, char** argv)
 {
@@ -37,13 +38,15 @@ int main(int argc, char** argv)
 	int memSize = atoi(argv[1]);
 	int pageSize = atoi(argv[2]) * 100;
 	vector<process> process_list;
+	vector<int> timeline;
 
 	if (pageSize == 300)
 		pageSize += 100;
 
 	//DO SOMETHING...
 	readInFile("in1.txt", process_list);
-	debug_print(process_list);
+	//debug_print(process_list);
+	printOutput(process_list, memSize, pageSize);
 
 	return 0;
 }
@@ -87,9 +90,32 @@ void readInFile(string input_file, vector<process> &process_list)
 	my_file.close();
 }
 
-void printOutput(vector<process>)
+void printOutput(vector<process> &process_list, int &memSize, int &pageSize)
 {
+	//Variables
+	vector<int> timeline;
+	int time_index;
 
+	// Loop through each process
+	for (int i = 0; i < process_list.size(); ++i)
+	{
+		if (timeline.empty() || (process_list[i].time_start > time_index))
+		{
+			time_index = process_list[i].time_start;
+			timeline.push_back(process_list[i].num);         // Add to timeline
+
+			cout << "t = " << time_index << ": Process " << process_list[i].num << " arrives" << endl;
+			cout << "       Input Queue: [";
+			v_print(timeline);
+			cout << "]" << endl;
+		}
+	}
+}
+
+void v_print(vector<int> &input_v)
+{
+	for (int i = 0; i < input_v.size(); ++i)
+		cout << input_v[i] << " ";
 }
 
 void debug_print(vector<process> &process_list)
