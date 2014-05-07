@@ -109,6 +109,15 @@ void printOutput(vector<process> &process_list, int &memSize, int &pageSize)
 			v_print(timeline);
 			cout << "]" << endl;
 		}
+		else if (process_list[i].time_start == time_index)
+		{
+			timeline.push_back(process_list[i].num);         // Add to timeline
+
+			cout << "       Process " << process_list[i].num << " arrives" <<endl;
+			cout << "       Input Queue: [";
+			v_print(timeline);
+			cout << "]" << endl;
+		}
 	}
 }
 
