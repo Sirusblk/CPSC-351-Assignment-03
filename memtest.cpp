@@ -20,8 +20,9 @@ struct process
 };
 
 //Prototypes
-void readInFile(string, vector<process>);
-void printOutput(vector<process>);
+void readInFile(string, vector<process> &);
+void debug_print(vector<process> &);
+void printOutput(vector<process> &);
 
 int main(int argc, char** argv)
 {
@@ -42,11 +43,12 @@ int main(int argc, char** argv)
 
 	//DO SOMETHING...
 	readInFile("in1.txt", process_list);
+	debug_print(process_list);
 
 	return 0;
 }
 
-void readInFile(string input_file, vector<process> process_list)
+void readInFile(string input_file, vector<process> &process_list)
 {
 	ifstream my_file;
 	my_file.open(input_file);
@@ -83,19 +85,25 @@ void readInFile(string input_file, vector<process> process_list)
 	}
 
 	my_file.close();
-
-	//DEBUG
-	/*
-	cout << "Start Debug...\n";
-	for (int i = 0; i < num_processes; ++i)
-	{
-		cout << my_processes[i].num << " | " << my_processes[i].time_start << " | " << my_processes[i].time_end << " | " << my_processes[i].num_block << endl;
-	}
-	cout << "End Debug...\n";
-	 */	
 }
 
 void printOutput(vector<process>)
 {
 
+}
+
+void debug_print(vector<process> &process_list)
+{
+	cout << "Start Debug...\n";
+	for (int i = 0; i < process_list.size(); ++i)
+	{
+		cout << process_list[i].num << " | " << process_list[i].time_start << " | " << process_list[i].time_end << " | " << process_list[i].num_block << " | ";
+		for (int j = 0; j < process_list[i].block_size.size(); ++j)
+		{
+			cout << process_list[i].block_size[j] << " ";
+		}
+
+		cout << endl;
+	}
+	cout << "End Debug...\n";
 }
