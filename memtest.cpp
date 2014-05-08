@@ -30,15 +30,25 @@ void debug_print(vector<process> &);
 int main(int argc, char** argv)
 {
 	// Check the command line arguments
-	if(argc < 2)
+	int memSize = 0;
+	int pageSize= 0;
+
+	if(argc == 3)
 	{
-		fprintf(stderr, "USAGE: %s <MEMSIZE_KBYTES> <PAGE_SIZE_OPTION>\n", argv[0]);
-		exit(-1);
+		// ./memtest <memSize> <pageSize>
+		memSize = atoi(argv[1]);
+		pageSize = atoi(argv[2]) * 100;
+	}
+	else
+	{
+		cout<< "Memory Size(Kbytes): ";
+		cin>> memSize;
+		cout<< "Page Size (1:100, 2:200, 3:300): ";
+		cin>> pageSize;
+		pageSize = pageSize * 100;
 	}
 
 	//Variables
-	int memSize = atoi(argv[1]);
-	int pageSize = atoi(argv[2]) * 100;
 	vector<process> process_list;
 	vector<int> timeline;
 
