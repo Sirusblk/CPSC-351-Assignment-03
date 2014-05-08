@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <queue>
@@ -21,6 +22,7 @@ struct process
 
 //Prototypes
 void readInFile(string, vector<process> &);
+void findTimes(vector<process> &, vector<int> &);
 void printOutput(vector<process> &, int &, int &);
 void v_print(vector<int> &);
 void debug_print(vector<process> &);
@@ -45,6 +47,7 @@ int main(int argc, char** argv)
 
 	//DO SOMETHING...
 	readInFile("in1.txt", process_list);
+	findTimes(process_list, timeline);
 	//debug_print(process_list);
 	printOutput(process_list, memSize, pageSize);
 
@@ -90,6 +93,45 @@ void readInFile(string input_file, vector<process> &process_list)
 	my_file.close();
 }
 
+void findTimes(vector<process> &process_list, vector<int> &timeline)
+{
+	// Variables
+	bool b_found;
+	bool e_found;
+
+	// Add to Timeline
+	for (int i = 0; i < process_list.size(); ++i)
+	{
+		b_found = false;
+		e_found = false;
+
+		for (int j = 0; j < timeline.size(); ++j)
+		{
+			if (process_list[i].time_start == timeline[j])
+			{
+				b_found = true;
+			}
+
+			if (process_list[i].time_start + process_list[i].time_end == timeline[j])
+			{
+				e_found = true;
+			}
+		}
+
+		if (!b_found)
+		{
+			timeline.push_back(process_list[i].time_start);
+		}
+
+		if (!e_found)
+		{
+			timeline.push_back(process_list[i].time_start + process_list[i].time_end);
+		}
+	}
+
+	sort(timeline.begin(), timeline.end());
+}
+
 void printOutput(vector<process> &process_list, int &memSize, int &pageSize)
 {
 	//Variables
@@ -104,8 +146,14 @@ void printOutput(vector<process> &process_list, int &memSize, int &pageSize)
 			time_index = process_list[i].time_start;
 			timeline.push_back(process_list[i].num);         // Add to timeline
 
+			if (process_list[i].time_end < end_index)
+			{
+				end_index = process_list[i].time_end;
+				//end =
+			}
+
 			cout << "t = " << time_index << ": Process " << process_list[i].num << " arrives" << endl;
-			cout << "       Input Queue: [";
+			cout << "       Input Queue: [ ";
 			v_print(timeline);
 			cout << "]" << endl;
 		}
@@ -114,10 +162,13 @@ void printOutput(vector<process> &process_list, int &memSize, int &pageSize)
 			timeline.push_back(process_list[i].num);         // Add to timeline
 
 			cout << "       Process " << process_list[i].num << " arrives" <<endl;
-			cout << "       Input Queue: [";
+			cout << "       Input Queue: [ ";
 			v_print(timeline);
 			cout << "]" << endl;
 		}
+		//Also check for process end
+
+		//Print Memory Map
 	}
 }
 
