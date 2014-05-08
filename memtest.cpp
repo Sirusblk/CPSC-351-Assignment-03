@@ -26,6 +26,7 @@ void findTimes(vector<process> &, vector<int> &);
 void printOutput(vector<process> &, int &, int &);
 void v_print(vector<int> &);
 void debug_print(vector<process> &);
+void memoryMap(vector<process> &process_list, int memSize, int pageSize);
 
 int main(int argc, char** argv)
 {
@@ -147,6 +148,7 @@ void printOutput(vector<process> &process_list, int &memSize, int &pageSize)
 	//Variables
 	vector<int> timeline;
 	int time_index;
+	int end_index;
 
 	// Loop through each process
 	for (int i = 0; i < process_list.size(); ++i)
@@ -179,7 +181,23 @@ void printOutput(vector<process> &process_list, int &memSize, int &pageSize)
 		//Also check for process end
 
 		//Print Memory Map
+		memoryMap(process_list, memSize, pageSize);
 	}
+}
+
+void memoryMap(vector<process> &process_list, int memSize, int pageSize)
+{
+	process temp_proc; 
+	cout<< "Memory Map: "<<endl;
+	for (int i= 0; i< memSize; i++)
+	{
+		int start = i;
+		int end = (start + pageSize)-1;
+		cout<< "     "<<start<< "-"<<end<< ": "<<endl;//<< "Process " << temp_proc.num << ", "<< "Page "<< _____ <<endl; 
+		i = end;
+		//start = end;
+	}
+	
 }
 
 void v_print(vector<int> &input_v)
