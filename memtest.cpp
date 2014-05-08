@@ -147,6 +147,7 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 	//Variables
 	vector<int> input_q;
 	bool first_line;
+	process temp;
 
 	// Loop through each process
 	for (int i = 0; i < timeline.size(); ++i)
@@ -188,10 +189,23 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 
 				// Change Memory Map...
 			}
+		}
+
+		while (input_q.size() != 0)
+		{
+			// Dequeue and add to MM
+			temp = process_list[input_q.front() - 1];
+			cout << "       MM moves Process " << temp.num << " to memory" << endl;
+			input_q.erase(input_q.begin());
+			
+			cout << "       Input Queue: [ ";
+			v_print(input_q);
+			cout << "]" << endl;
 
 			// Add to Memory Map...
 			// Display Memory Map...
 		}
+
 		cout << endl;
 	}
 }
