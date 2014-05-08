@@ -23,7 +23,7 @@ struct process
 //Prototypes
 void readInFile(string, vector<process> &);
 void findTimes(vector<process> &, vector<int> &);
-void printOutput(vector<process> &, int &, int &);
+void printOutput(vector<process> &, vector<int> &, int &, int &);
 void v_print(vector<int> &);
 void debug_print(vector<process> &);
 
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 	{
 		cout<< "Memory Size(Kbytes): ";
 		cin>> memSize;
-		cout<< "Page Size (1:100, 2:200, 3:300): ";
+		cout<< "Page Size (1:100, 2:200, 3:400): ";
 		cin>> pageSize;
 		pageSize = pageSize * 100;
 	}
@@ -58,8 +58,7 @@ int main(int argc, char** argv)
 	//DO SOMETHING...
 	readInFile("in1.txt", process_list);
 	findTimes(process_list, timeline);
-	//debug_print(process_list);
-	printOutput(process_list, memSize, pageSize);
+	printOutput(process_list, timeline, memSize, pageSize);
 
 	return 0;
 }
@@ -142,43 +141,62 @@ void findTimes(vector<process> &process_list, vector<int> &timeline)
 	sort(timeline.begin(), timeline.end());
 }
 
-void printOutput(vector<process> &process_list, int &memSize, int &pageSize)
+void printOutput(vector<process> &process_list, vector<int> &timeline, int &memSize, int &pageSize)
 {
 	//Variables
-	vector<int> timeline;
+	vector<int> input_q;
 	int time_index;
+	bool first_line;
 
 	// Loop through each process
-	for (int i = 0; i < process_list.size(); ++i)
+	for (int i = 0; i < timeline.size(); ++i)
 	{
-		if (timeline.empty() || (process_list[i].time_start > time_index))
-		{
-			time_index = process_list[i].time_start;
-			timeline.push_back(process_list[i].num);         // Add to timeline
+		first_line = true;
 
-			if (process_list[i].time_end < end_index)
+		cout << "t = " << timeline[i] << ": ";
+
+		// Complete functions at this time to make room
+		// And add new processes!
+		for (int j = 0; j < process_list.size(); ++j)
+		{
+			// Times sync up for start time
+			if (process_list[j].time_start == timeline[i])
 			{
-				end_index = process_list[i].time_end;
-				//end =
+				input_q.push_back(process_list[j].num);
+
+				if (!first_line)
+				{
+					cout << "       ";
+				}
+
+				cout << "Process " << process_list[j].num << " arrives" << endl;
+				cout << "       Input Queue: [ ";
+				v_print(input_q);
+				cout << "]" << endl;
+
+				first_line = false;
+			}
+			else if (process_list[j].time_start + process_list[j].time_end == timeline[i])
+			{
+				if (!first_line)
+				{
+					cout << "       ";
+				}
+
+				cout << "Process " << process_list[j].num << " completes" << endl;
+				cout << "         Input Queue: [ ";
+				v_print(input_q);
+				cout << "]" << endl;
+
+				// Change Memory Map...
+
+				first_line = false;
 			}
 
-			cout << "t = " << time_index << ": Process " << process_list[i].num << " arrives" << endl;
-			cout << "       Input Queue: [ ";
-			v_print(timeline);
-			cout << "]" << endl;
+			// Add to Memory Map...
+			// Display Memory Map...
 		}
-		else if (process_list[i].time_start == time_index)
-		{
-			timeline.push_back(process_list[i].num);         // Add to timeline
-
-			cout << "       Process " << process_list[i].num << " arrives" <<endl;
-			cout << "       Input Queue: [ ";
-			v_print(timeline);
-			cout << "]" << endl;
-		}
-		//Also check for process end
-
-		//Print Memory Map
+		cout << endl;
 	}
 }
 
