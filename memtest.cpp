@@ -146,12 +146,7 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 {
 	//Variables
 	vector<int> input_q;
-	int time_index;
-<<<<<<< HEAD
-	int end_index;
-=======
 	bool first_line;
->>>>>>> f72c41db89a5ab4bfdf5f26ad8edcc88f5331f11
 
 	// Loop through each process
 	for (int i = 0; i < timeline.size(); ++i)
@@ -189,24 +184,15 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 				}
 
 				cout << "Process " << process_list[j].num << " completes" << endl;
-				cout << "         Input Queue: [ ";
-				v_print(input_q);
-				cout << "]" << endl;
+				first_line = false;
 
 				// Change Memory Map...
-
-<<<<<<< HEAD
-		//Print Memory Map
-		memoryMap(process_list, memSize, pageSize);
-=======
-				first_line = false;
 			}
 
 			// Add to Memory Map...
 			// Display Memory Map...
 		}
 		cout << endl;
->>>>>>> f72c41db89a5ab4bfdf5f26ad8edcc88f5331f11
 	}
 }
 
