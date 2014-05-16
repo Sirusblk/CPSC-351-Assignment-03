@@ -26,7 +26,9 @@ void findTimes(vector<process> &, vector<int> &);
 void printOutput(vector<process> &, vector<int> &, int &, int &);
 void v_print(vector<int> &);
 void debug_print(vector<process> &);
-void memoryMap(vector<process> &process_list, int memSize, int pageSize);
+void createMemoryMap(int [], int &, int &);
+void addToMemoryMap(int [], int &, int &);
+void printMemoryMap(int [], int &, int &);
 
 int main(int argc, char** argv)
 {
@@ -148,6 +150,14 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 	vector<int> input_q;
 	bool first_line;
 	process temp;
+	int *memoryMap;
+
+	//Create Memory Map
+	memoryMap = new int[memSize / pageSize];
+	for (int i = 0; i < (memSize / pageSize); ++i)
+	{
+		memoryMap[i] = -1;
+	}
 
 	// Loop through each process
 	for (int i = 0; i < timeline.size(); ++i)
@@ -196,31 +206,62 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 			// Dequeue and add to MM
 			temp = process_list[input_q.front() - 1];
 			cout << "       MM moves Process " << temp.num << " to memory" << endl;
+
+			// Add to Memory Map...
+
+
 			input_q.erase(input_q.begin());
 			
 			cout << "       Input Queue: [ ";
 			v_print(input_q);
 			cout << "]" << endl;
 
-			// Add to Memory Map...
 			// Display Memory Map...
+			printMemoryMap(memoryMap, memSize, pageSize);
 		}
 
 		cout << endl;
 	}
 }
 
-void memoryMap(vector<process> &process_list, int memSize, int pageSize)
+void createMemoryMap(int *memoryMap, int &memSize, int &pageSize)
 {
-	process temp_proc; 
-	cout<< "Memory Map: "<<endl;
-	for (int i= 0; i< memSize; i++)
+	memoryMap = new int[memSize / pageSize];
+	for (int i = 0; i < (memSize / pageSize); ++i)
 	{
-		int start = i;
-		int end = (start + pageSize)-1;
-		cout<< "     "<<start<< "-"<<end<< ": "<<endl;//<< "Process " << temp_proc.num << ", "<< "Page "<< _____ <<endl; 
-		i = end;
-		//start = end;
+		memoryMap[i] = -1;
+	}
+}
+
+void addToMemoryMap(int memoryMap[], int &memSize, int &pageSize)
+{
+
+}
+
+void printMemoryMap(int memoryMap[], int &memSize, int &pageSize)
+{
+	cout<< "       Memory Map: " << endl;
+	int count = 0;
+	int pageNum = 0;
+	int processNum = 0;
+
+	while (memoryMap[count] != -1 && count < (memSize / pageSize))
+	{
+		if (processNum != memoryMap[count])
+		{
+			processNum = memoryMap[count];
+			pageNum = 0;
+		}
+
+		pageNum++;
+		cout << "            " << count << "-" << count - 1 << ": Process " << memoryMap[count] << " , Page " << pageNum << endl;
+
+		count++;
+	}
+
+	if (count < (memSize / pageSize) - 1)
+	{
+		cout << "            " << count * pageSize << "-" << memSize - 1 << ": Free frame(s)" <<endl;
 	}
 	
 }
