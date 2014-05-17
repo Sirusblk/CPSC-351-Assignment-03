@@ -14,10 +14,10 @@ using namespace std;
 struct process
 {
 	int num;
-	int time_start;
-	int time_end;
-	int num_block;
-	vector<int> block_size;
+	int timeStart;
+	int timeEnd;
+	int numBlocks;
+	vector<int> blockSizes;
 };
 
 struct memoryBlock
@@ -90,16 +90,16 @@ void readInFile(string input_file, vector<process> &process_list)
 	{
 		// Grab all atributes
 		my_file >> temp_proc.num;
-		my_file >> temp_proc.time_start;
-		my_file >> temp_proc.time_end;
-		my_file >> temp_proc.num_block;
+		my_file >> temp_proc.timeStart;
+		my_file >> temp_proc.timeEnd;
+		my_file >> temp_proc.numBlocks;
 
 		// Create vector at run time for block sizes
-		vector<int> block_cont(temp_proc.num_block);
+		vector<int> block_cont(temp_proc.numBlocks);
 		int block;
 
 		// Store values in a vector
-		for (int j = 0; j < temp_proc.num_block; ++j)
+		for (int j = 0; j < temp_proc.numBlocks; ++j)
 		{
 			my_file >> block;
 			block_cont.push_back(block);
@@ -107,7 +107,7 @@ void readInFile(string input_file, vector<process> &process_list)
 
 		// Swap vector into temporary process
 		// ! THIS ISN'T WORKING!
-		temp_proc.block_size.swap(block_cont);
+		temp_proc.blockSizes.swap(block_cont);
 		
 		// Push back temporary process into process vector
 		process_list.push_back(temp_proc);
@@ -130,12 +130,12 @@ void findTimes(vector<process> &process_list, vector<int> &timeline)
 
 		for (int j = 0; j < timeline.size(); ++j)
 		{
-			if (process_list[i].time_start == timeline[j])
+			if (process_list[i].timeStart == timeline[j])
 			{
 				b_found = true;
 			}
 
-			if (process_list[i].time_start + process_list[i].time_end == timeline[j])
+			if (process_list[i].timeStart + process_list[i].timeEnd == timeline[j])
 			{
 				e_found = true;
 			}
@@ -143,12 +143,12 @@ void findTimes(vector<process> &process_list, vector<int> &timeline)
 
 		if (!b_found)
 		{
-			timeline.push_back(process_list[i].time_start);
+			timeline.push_back(process_list[i].timeStart);
 		}
 
 		if (!e_found)
 		{
-			timeline.push_back(process_list[i].time_start + process_list[i].time_end);
+			timeline.push_back(process_list[i].timeStart + process_list[i].timeEnd);
 		}
 	}
 
@@ -178,7 +178,7 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 		for (int j = 0; j < process_list.size(); ++j)
 		{
 			// Times sync up for start time
-			if (process_list[j].time_start == timeline[i])
+			if (process_list[j].timeStart == timeline[i])
 			{
 				input_q.push_back(process_list[j].num);
 
@@ -194,7 +194,7 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 
 				first_line = false;
 			}
-			else if (process_list[j].time_start + process_list[j].time_end == timeline[i])
+			else if (process_list[j].timeStart + process_list[j].timeEnd == timeline[i])
 			{
 				if (!first_line)
 				{
@@ -252,10 +252,10 @@ void addToMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize,
 	int blockCount = 0;
 	int section = 0;
 
-	cout << "DEBUG: Process " << input.num << ": " << input.time_start << " - " << input.time_end << " | " << input.num_block
-		 << ": " << input.block_size[0] << endl;
+	cout << "DEBUG: Process " << input.num << ": " << input.timeStart << " - " << input.timeEnd << " | " << input.numBlocks
+		 << ": " << input.blockSizes[0] << endl;
 
-	while (count < (memSize / pageSize) && blockCount <= input.block_size[section])
+	while (count < (memSize / pageSize) && blockCount <= input.blockSizes[section])
 	{
 		if(memoryMap[count].blockFree)
 		{
@@ -265,7 +265,7 @@ void addToMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize,
 			blockCount++;
 		}
 
-		if (blockCount == input.block_size[section] && section < input.num_block)
+		if (blockCount == input.blockSizes[section] && section < input.numBlocks)
 		{
 			section++;
 		}
@@ -307,10 +307,10 @@ void debug_print(vector<process> &process_list)
 	cout << "Start Debug...\n";
 	for (int i = 0; i < process_list.size(); ++i)
 	{
-		cout << process_list[i].num << " | " << process_list[i].time_start << " | " << process_list[i].time_end << " | " << process_list[i].num_block << " | ";
-		for (int j = 0; j < process_list[i].block_size.size(); ++j)
+		cout << process_list[i].num << " | " << process_list[i].timeStart << " | " << process_list[i].timeEnd << " | " << process_list[i].numBlocks << " | ";
+		for (int j = 0; j < process_list[i].blockSizes.size(); ++j)
 		{
-			cout << process_list[i].block_size[j] << " ";
+			cout << process_list[i].blockSizes[j] << " ";
 		}
 
 		cout << endl;
