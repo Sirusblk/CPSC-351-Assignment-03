@@ -95,19 +95,18 @@ void readInFile(string input_file, vector<process> &process_list)
 		my_file >> temp_proc.numBlocks;
 
 		// Create vector at run time for block sizes
-		vector<int> block_cont(temp_proc.numBlocks);
+		vector<int> tempBlockSizes;
 		int block;
 
 		// Store values in a vector
 		for (int j = 0; j < temp_proc.numBlocks; ++j)
 		{
 			my_file >> block;
-			block_cont.push_back(block);
+			tempBlockSizes.push_back(block);
 		}
 
 		// Swap vector into temporary process
-		// ! THIS ISN'T WORKING!
-		temp_proc.blockSizes.swap(block_cont);
+		temp_proc.blockSizes = tempBlockSizes;
 		
 		// Push back temporary process into process vector
 		process_list.push_back(temp_proc);
