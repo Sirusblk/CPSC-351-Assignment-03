@@ -20,6 +20,15 @@ struct process
 	vector<int> block_size;
 };
 
+struct memoryBlock
+{
+	int blockStart;
+	int blockEnd;
+	int processNum;
+	int pageNum;
+	bool blockFree;
+};
+
 //Prototypes
 void readInFile(string, vector<process> &);
 void findTimes(vector<process> &, vector<int> &);
@@ -27,8 +36,9 @@ void printOutput(vector<process> &, vector<int> &, int &, int &);
 void v_print(vector<int> &);
 void debug_print(vector<process> &);
 void createMemoryMap(int [], int &, int &);
-void addToMemoryMap(int [], int &, int &);
-void printMemoryMap(int [], int &, int &);
+void createMemoryMap(memoryBlock *, int &, int &);
+void addToMemoryMap(memoryBlock [], int &, int &, process &);
+void printMemoryMap(memoryBlock [], int &, int &);
 
 int main(int argc, char** argv)
 {
@@ -150,14 +160,12 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 	vector<int> input_q;
 	bool first_line;
 	process temp;
-	int *memoryMap;
+	memoryBlock *memoryMap;
 
 	//Create Memory Map
-	memoryMap = new int[memSize / pageSize];
-	for (int i = 0; i < (memSize / pageSize); ++i)
-	{
-		memoryMap[i] = -1;
-	}
+	createMemoryMap(memoryMap, memSize, pageSize);
+
+	cout << memoryMap[0].processNum << endl;
 
 	// Loop through each process
 	for (int i = 0; i < timeline.size(); ++i)
@@ -208,7 +216,9 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 			cout << "       MM moves Process " << temp.num << " to memory" << endl;
 
 			// Add to Memory Map...
-
+			int index = input_q.front();
+			temp = process_list[index];
+			addToMemoryMap(memoryMap, memSize, pageSize, temp);
 
 			input_q.erase(input_q.begin());
 			
@@ -224,37 +234,42 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 	}
 }
 
-void createMemoryMap(int *memoryMap, int &memSize, int &pageSize)
+void createMemoryMap(memoryBlock *memoryMap, int &memSize, int &pageSize)
 {
-	memoryMap = new int[memSize / pageSize];
+	memoryMap = new memoryBlock[memSize / pageSize];
 	for (int i = 0; i < (memSize / pageSize); ++i)
 	{
-		memoryMap[i] = -1;
+		memoryMap[i].blockStart = i * pageSize;
+		memoryMap[i].blockEnd = ((i + 1) * pageSize) - 1;
+		memoryMap[i].processNum = -1;
+		memoryMap[i].pageNum = -1;
+		memoryMap[i].blockFree = true;
 	}
 }
 
-void addToMemoryMap(int memoryMap[], int &memSize, int &pageSize)
+void addToMemoryMap(memoryBlock memoryMap[], int &memSize, int &pageSize, process &input)
 {
+	int count = 0;
 
+	while (!memoryMap[count].blockFree && count < (memSize / pageSize))
+	{
+		//Many blocks split up, need a struct!
+
+		count++;
+	}
 }
 
-void printMemoryMap(int memoryMap[], int &memSize, int &pageSize)
+void printMemoryMap(memoryBlock memoryMap[], int &memSize, int &pageSize)
 {
-	cout<< "       Memory Map: " << endl;
+	cout << "       Memory Map: " << endl;
 	int count = 0;
 	int pageNum = 0;
 	int processNum = 0;
 
-	while (memoryMap[count] != -1 && count < (memSize / pageSize))
+	while (!memoryMap[count].blockFree && count < (memSize / pageSize))
 	{
-		if (processNum != memoryMap[count])
-		{
-			processNum = memoryMap[count];
-			pageNum = 0;
-		}
-
-		pageNum++;
-		cout << "            " << count << "-" << count - 1 << ": Process " << memoryMap[count] << " , Page " << pageNum << endl;
+		cout << "            " << memoryMap[count].blockStart << "-" << memoryMap[count].blockEnd << ": Process " 
+			 << memoryMap[count].processNum << " , Page " << memoryMap[count].pageNum << endl;
 
 		count++;
 	}
