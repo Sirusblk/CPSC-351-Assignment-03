@@ -254,7 +254,7 @@ void addToMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize,
 	cout << "DEBUG: Process " << input.num << ": " << input.timeStart << " - " << input.timeEnd << " | " << input.numBlocks
 		 << ": " << input.blockSizes[0] << endl;
 
-	while (count < (memSize / pageSize) && blockCount <= input.blockSizes[section])
+	while (count < (memSize / pageSize) && blockCount < (input.blockSizes[section] / pageSize))
 	{
 		if(memoryMap[count].blockFree)
 		{
