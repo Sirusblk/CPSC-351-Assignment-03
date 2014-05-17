@@ -106,6 +106,7 @@ void readInFile(string input_file, vector<process> &process_list)
 		}
 
 		// Swap vector into temporary process
+		// ! THIS ISN'T WORKING!
 		temp_proc.block_size.swap(block_cont);
 		
 		// Push back temporary process into process vector
@@ -214,8 +215,6 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 			cout << "       MM moves Process " << temp.num << " to memory" << endl;
 
 			// Add to Memory Map...
-			int index = input_q.front();
-			temp = process_list[index];
 			addToMemoryMap(memoryMap, memSize, pageSize, temp);
 
 			input_q.erase(input_q.begin());
@@ -235,6 +234,7 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 void createMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize)
 {
 	memoryBlock temp;
+
 	for (int i = 0; i < (memSize / pageSize); ++i)
 	{
 		temp.blockStart = i * pageSize;
@@ -250,21 +250,27 @@ void addToMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize,
 {
 	int count = 0;
 	int blockCount = 0;
+	int section = 0;
 
-	while (count < (memSize / pageSize))
+	cout << "DEBUG: Process " << input.num << ": " << input.time_start << " - " << input.time_end << " | " << input.num_block
+		 << ": " << input.block_size[0] << endl;
+
+	while (count < (memSize / pageSize) && blockCount <= input.block_size[section])
 	{
 		if(memoryMap[count].blockFree)
 		{
-			memoryMap[count].processNum = input.num_block;
-			memoryMap[count].pageNum = input.block_size[blockCount];
+			memoryMap[count].processNum = input.num;
+			memoryMap[count].pageNum = blockCount + 1;
+			memoryMap[count].blockFree = false;
+			blockCount++;
 		}
 
-		if (blockCount == input.block_size.size())
+		if (blockCount == input.block_size[section] && section < input.num_block)
 		{
-			count++;
+			section++;
 		}
-
-		blockCount++;
+		
+		count++;
 	}
 }
 
