@@ -38,7 +38,7 @@ void debug_print(vector<process> &);
 void createMemoryMap(int [], int &, int &);
 void createMemoryMap(vector<memoryBlock> &, int &, int &);
 bool addToMemoryMap(vector<memoryBlock> &, int &, int &, process &);
-int checkIfSpace(vector<memoryBlock> &, int &, int &, process &);
+int checkIfSpace(vector<memoryBlock> &, int &, int &, int &);
 void printMemoryMap(vector<memoryBlock> &, int &, int &);
 void removeFromMemoryMap(vector<memoryBlock> &, int &, int &, int &);
 
@@ -230,7 +230,7 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 			temp = process_list[input_q.front() - 1];
 
 			// Add to Memory Map...
-			if( addToMemoryMap(memoryMap, memSize, pageSize, temp) )
+			if ( addToMemoryMap(memoryMap, memSize, pageSize, temp) )
 			{
 				cout << "       MM moves Process " << temp.num << " to memory" << endl;
 
@@ -272,6 +272,8 @@ bool addToMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize,
 	int count = 0;
 	int blockCount = 0;
 	int section = 0;
+	double blockSize;
+	int intBlockSize;
 
 	//DEBUG
 	//cout << "DEBUG: Process " << input.num << ": " << input.timeStart << " - " << input.timeEnd << " | " << input.numBlocks
@@ -284,7 +286,23 @@ bool addToMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize,
 	//Loop through number of blocks
 	for (int i = 0; i < input.numBlocks; ++i)
 	{
-		startBlock = checkIfSpace(memoryMap, memSize, pageSize, input);
+		blockSize = input.blockSizes[i] / pageSize;
+
+		// Look ahead and see if we can combine multiple blocks together
+		for (int j = i; j < input.numBlocks; ++j)
+		{
+			blockSize += (input.blockSizes[j] / pageSize);
+		}
+
+		intBlockSize = (int) blockSize;
+		startBlock = checkIfSpace(memoryMap, memSize, pageSize, intBlockSize);
+
+		if (startBlock == -1)
+		{
+			intBlockSize = (int) blockSize;
+			startBlock = checkIfSpace(memoryMap, memSize, pageSize, intBlockSize);
+		}
+		
 		/*
 		cout << " == DEBUG ==\n";
 		cout << "Process: " << input.num << ":" << i << endl;
@@ -325,9 +343,11 @@ void removeFromMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &page
 	}
 }
 
-int checkIfSpace(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize, process &input)
+int checkIfSpace(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize, int &inputBlockSize)
 {
 	int numFree = 0;
+
+	//cout << "DEBUG: Input Block Size - " << inputBlockSize << endl;
 
 	for (int i = 0; i < memoryMap.size(); ++i)
 	{
@@ -341,9 +361,11 @@ int checkIfSpace(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize, pr
 		}
 
 		//If there is room fill it up
-		if (numFree == input.numBlocks)
+		if (numFree == inputBlockSize)
 		{
-			return (i + 1 - input.numBlocks);
+			//cout << "DEBUG: Number Free - " << numFree << " Input Size - " << inputBlockSize << " Returning - " << (i + 1 - inputBlockSize) << endl;
+
+			return (i + 1 - inputBlockSize);
 		}
 	}
 
