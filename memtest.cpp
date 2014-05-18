@@ -203,8 +203,6 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 
 				cout << "Process " << process_list[j].num << " completes" << endl;
 				first_line = false;
-
-				// Change Memory Map...
 			}
 		}
 
@@ -212,19 +210,26 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 		{
 			// Dequeue and add to MM
 			temp = process_list[input_q.front() - 1];
-			cout << "       MM moves Process " << temp.num << " to memory" << endl;
 
 			// Add to Memory Map...
-			addToMemoryMap(memoryMap, memSize, pageSize, temp);
-
-			input_q.erase(input_q.begin());
+			if( addToMemoryMap(memoryMap, memSize, pageSize, temp) )
+			{
+				cout << "       MM moves Process " << temp.num << " to memory" << endl;
+				
+				input_q.erase(input_q.begin());
 			
-			cout << "       Input Queue: [ ";
-			v_print(input_q);
-			cout << "]" << endl;
+				cout << "       Input Queue: [ ";
+				v_print(input_q);
+				cout << "]" << endl;
 
-			// Display Memory Map...
-			printMemoryMap(memoryMap, memSize, pageSize);
+				// Display Memory Map...
+				printMemoryMap(memoryMap, memSize, pageSize);
+			}
+			else
+			{
+				cout << "\nERROR: No free space!\n\n";
+				break;
+			}
 		}
 
 		cout << endl;
