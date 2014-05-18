@@ -40,6 +40,7 @@ void createMemoryMap(vector<memoryBlock> &, int &, int &);
 bool addToMemoryMap(vector<memoryBlock> &, int &, int &, process &);
 int checkIfSpace(vector<memoryBlock> &, int &, int &, process &);
 void printMemoryMap(vector<memoryBlock> &, int &, int &);
+void removeFromMemoryMap(vector<memoryBlock> &, int &, int &, int &);
 
 int main(int argc, char** argv)
 {
@@ -161,7 +162,9 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 	vector<int> input_q;
 	bool first_line;
 	process temp;
+	int temp2;
 	vector<memoryBlock> memoryMap;
+	vector<int> processesToRemove;
 
 	//Create Memory Map
 	createMemoryMap(memoryMap, memSize, pageSize);
@@ -202,10 +205,21 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 				}
 
 				cout << "Process " << process_list[j].num << " completes" << endl;
+				processesToRemove.push_back(process_list[j].num);
 				first_line = false;
 			}
 		}
 
+		//Remove processes from Memory Map
+		while (processesToRemove.size() != 0)
+		{
+			temp2 = processesToRemove.front();
+			removeFromMemoryMap(memoryMap, memSize, pageSize, temp2);
+			printMemoryMap(memoryMap, memSize, pageSize);
+			processesToRemove.erase(processesToRemove.begin());
+		}
+
+		//Add processes to Memory Map
 		while (input_q.size() != 0)
 		{
 			// Dequeue and add to MM
@@ -215,7 +229,7 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 			if( addToMemoryMap(memoryMap, memSize, pageSize, temp) )
 			{
 				cout << "       MM moves Process " << temp.num << " to memory" << endl;
-				
+
 				input_q.erase(input_q.begin());
 			
 				cout << "       Input Queue: [ ";
@@ -298,6 +312,17 @@ bool addToMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize,
 	return wasAdded;
 }
 
+void removeFromMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize, int &input)
+{
+	for (int i = 0; i < memoryMap.size(); ++i)
+	{
+		if (memoryMap[i].processNum == input)
+		{
+			memoryMap[i].blockFree = true;
+		}
+	}
+}
+
 int checkIfSpace(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize, process &input)
 {
 	int numFree = 0;
@@ -329,11 +354,27 @@ void printMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize)
 	int count = 0;
 	int pageNum = 0;
 	int processNum = 0;
+	int start = -1;
+	int end = -1;
 
-	while (!memoryMap[count].blockFree && count < (memSize / pageSize))
+	while (count < (memSize / pageSize))
 	{
-		cout << "            " << memoryMap[count].blockStart << "-" << memoryMap[count].blockEnd << ": Process " 
-			 << memoryMap[count].processNum << " , Page " << memoryMap[count].pageNum << endl;
+		if (!memoryMap[count].blockFree)
+		{
+			if (start != -1)
+			{
+				end = count - 1;
+				cout << "            " << start << "-" << ((end + 1) * pageSize) - 1 << ": Free frame(s)" <<endl;
+				start = -1;
+			}
+
+			cout << "            " << memoryMap[count].blockStart << "-" << memoryMap[count].blockEnd << ": Process " 
+				 << memoryMap[count].processNum << " , Page " << memoryMap[count].pageNum << endl;
+		}
+		else if (start == -1)
+		{
+			start = count;
+		}
 
 		count++;
 	}
