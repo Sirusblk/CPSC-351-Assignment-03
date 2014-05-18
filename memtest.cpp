@@ -205,12 +205,15 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 				}
 
 				cout << "Process " << process_list[j].num << " completes" << endl;
-				processesToRemove.push_back(process_list[j].num);
+				removeFromMemoryMap(memoryMap, memSize, pageSize, process_list[j].num);
+				printMemoryMap(memoryMap, memSize, pageSize);
+				//processesToRemove.push_back(process_list[j].num);
 				first_line = false;
 			}
 		}
 
 		//Remove processes from Memory Map
+		/*
 		while (processesToRemove.size() != 0)
 		{
 			temp2 = processesToRemove.front();
@@ -218,6 +221,7 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 			printMemoryMap(memoryMap, memSize, pageSize);
 			processesToRemove.erase(processesToRemove.begin());
 		}
+		 */
 
 		//Add processes to Memory Map
 		while (input_q.size() != 0)
@@ -245,8 +249,6 @@ void printOutput(vector<process> &process_list, vector<int> &timeline, int &memS
 				break;
 			}
 		}
-
-		cout << endl;
 	}
 }
 
@@ -354,24 +356,24 @@ void printMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize)
 	int count = 0;
 	int pageNum = 0;
 	int processNum = 0;
-	int start = -1;
-	int end = -1;
+	int start = 0;
+	int end = 0;
 
 	while (count < (memSize / pageSize))
 	{
 		if (!memoryMap[count].blockFree)
 		{
-			if (start != -1)
+			if (start != 0)
 			{
 				end = count - 1;
-				cout << "            " << start << "-" << ((end + 1) * pageSize) - 1 << ": Free frame(s)" <<endl;
-				start = -1;
+				cout << "            " << start * pageSize << "-" << ((end + 1) * pageSize) - 1 << ": Free frame(s)" <<endl;
+				start = 0;
 			}
 
 			cout << "            " << memoryMap[count].blockStart << "-" << memoryMap[count].blockEnd << ": Process " 
 				 << memoryMap[count].processNum << " , Page " << memoryMap[count].pageNum << endl;
 		}
-		else if (start == -1)
+		else if (start == 0)
 		{
 			start = count;
 		}
@@ -379,11 +381,13 @@ void printMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize)
 		count++;
 	}
 
-	if (count < (memSize / pageSize) - 1)
+	if (start != 0)
 	{
-		cout << "            " << count * pageSize << "-" << memSize - 1 << ": Free frame(s)" <<endl;
+		end = count - 1;
+		cout << "            " << start * pageSize << "-" << ((end + 1) * pageSize) - 1 << ": Free frame(s)" <<endl;
 	}
-	
+
+	cout << endl;
 }
 
 void v_print(vector<int> &input_v)
