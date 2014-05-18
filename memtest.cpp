@@ -37,7 +37,8 @@ void v_print(vector<int> &);
 void debug_print(vector<process> &);
 void createMemoryMap(int [], int &, int &);
 void createMemoryMap(vector<memoryBlock> &, int &, int &);
-void addToMemoryMap(vector<memoryBlock> &, int &, int &, process &);
+bool addToMemoryMap(vector<memoryBlock> &, int &, int &, process &);
+int checkIfSpace(vector<memoryBlock> &, int &, int &, process &);
 void printMemoryMap(vector<memoryBlock> &, int &, int &);
 
 int main(int argc, char** argv)
@@ -245,32 +246,76 @@ void createMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize
 	}
 }
 
-void addToMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize, process &input)
+bool addToMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize, process &input)
 {
 	int count = 0;
 	int blockCount = 0;
 	int section = 0;
 
-	cout << "DEBUG: Process " << input.num << ": " << input.timeStart << " - " << input.timeEnd << " | " << input.numBlocks
-		 << ": " << input.blockSizes[0] << endl;
+	//DEBUG
+	//cout << "DEBUG: Process " << input.num << ": " << input.timeStart << " - " << input.timeEnd << " | " << input.numBlocks
+	//	 << ": " << input.blockSizes[0] << endl;
 
-	while (count < (memSize / pageSize) && blockCount < (input.blockSizes[section] / pageSize))
+	int startBlock = -1;
+	bool wasAdded;
+	int numPage = 1;
+
+	//Loop through number of blocks
+	for (int i = 0; i < input.numBlocks; ++i)
 	{
-		if(memoryMap[count].blockFree)
+		startBlock = checkIfSpace(memoryMap, memSize, pageSize, input);
+		/*
+		cout << " == DEBUG ==\n";
+		cout << "Process: " << input.num << ":" << i << endl;
+		cout << "Start Here: " << startBlock << endl;
+		cout << "End Here: " << startBlock + ((input.blockSizes[i] + 99) / pageSize) << endl;
+		cout << endl;
+		 */
+
+		wasAdded = false;
+
+		if (startBlock > -1)
 		{
-			memoryMap[count].processNum = input.num;
-			memoryMap[count].pageNum = blockCount + 1;
-			memoryMap[count].blockFree = false;
-			blockCount++;
+			wasAdded = true;
+			
+			//cout << "Space found! " << startBlock << " " << ((input.blockSizes[i] + 99) / pageSize) << endl;
+			for (int j = startBlock; j < (startBlock + ((input.blockSizes[i] + 99) / pageSize)); ++j)
+			{
+				memoryMap[j].processNum = input.num;
+				memoryMap[j].pageNum = numPage;
+				memoryMap[j].blockFree = false;
+				numPage++;
+				//cout << "Added!\n";
+			}	
+		}
+	}
+
+	return wasAdded;
+}
+
+int checkIfSpace(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize, process &input)
+{
+	int numFree = 0;
+
+	for (int i = 0; i < memoryMap.size(); ++i)
+	{
+		if (memoryMap[i].blockFree)
+		{
+			numFree++;
+		}
+		else
+		{
+			numFree = 0;
 		}
 
-		if (blockCount == input.blockSizes[section] && section < input.numBlocks)
+		//If there is room fill it up
+		if (numFree == input.numBlocks)
 		{
-			section++;
+			return (i + 1 - input.numBlocks);
 		}
-		
-		count++;
 	}
+
+	return -1;
 }
 
 void printMemoryMap(vector<memoryBlock> &memoryMap, int &memSize, int &pageSize)
